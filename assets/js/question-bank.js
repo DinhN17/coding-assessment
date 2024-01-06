@@ -58,7 +58,7 @@ const questionBank = {
     // _getRandomPatch return an array which elements are randomly pick from source array.
     _getRandomPatch: function(srcArray, patchLength) {
         var retArray = [];
-        var tempArray = srcArray;
+        var tempArray = JSON.parse(JSON.stringify(srcArray));
         if (patchLength > tempArray.length) {
             patchLength = tempArray.length;            
         };
@@ -77,7 +77,7 @@ const questionBank = {
         // var srcJSQuiz = this.jsQuestions;
         var retJSQuiz = this._getRandomPatch(this.jsQuestions, number);
         
-        // reshuffle options of each question
+        // shuffle options of each question
         retJSQuiz.forEach(element => {
             element.options = this._getRandomPatch(element.options, element.options.length);
         });
