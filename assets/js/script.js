@@ -1,2 +1,1 @@
-var newJSQuiz = Object.create(questionBank);
-console.log(newJSQuiz.generateJSQuiz(5));
+console.log(questionBank.generateJSQuiz(3));
