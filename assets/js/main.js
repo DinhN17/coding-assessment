@@ -99,6 +99,7 @@ const numberQuestions = 5;
 var questionPatch;
 var questionIndex = 0;
 var lastAnswer = "";
+var timeInterval;
 var timeCounter = 100;
 
 // render question in quiz.
@@ -133,6 +134,9 @@ function renderSubmitResult() {
     // render question on quiz-header
     quizHeader.firstElementChild.textContent = "All done!";
     
+    // upfate timer
+    timeEL.textContent = 'Time: ' + timeCounter;
+
     // render final scores on quiz-body
     quizBody.innerHTML = "";
     var p = document.createElement("p");
@@ -144,8 +148,26 @@ function renderSubmitResult() {
     
 }
 
-function init() {    
+// countdown timer
+function startTimer() {
+    // Use the `setInterval()` method to call a function to be executed every 1000 milliseconds
+    timeInterval = setInterval(function () {
+      //
+      if (timeCounter > 0) {
+        // Show the remaining time.
+        timeEL.textContent = 'Time: ' + timeCounter;
+        // Decrement `timeLeft` by 1
+        timeCounter--;
+      } else {
+        // Use `clearInterval()` to stop the timer
+        clearInterval(timeInterval);
+        // quiz is done, show the result
+        renderSubmitResult();
+      }
+    }, 1000);
 }
+function init() {    
+};
 
 // const quiz = questionBank.generateJSQuiz(5);
 // showQuiz(questionBank.generateJSQuiz(5));
@@ -160,9 +182,10 @@ startButton.addEventListener("click", function (event) {
         renderQuiz(questionPatch[questionIndex]);
 
         //start timer
+        startTimer();
 
       }    
-})
+});
 
 //click on option in quiz-body to make choice
 quizBody.addEventListener("click", function (event) {
@@ -177,14 +200,18 @@ quizBody.addEventListener("click", function (event) {
         }
         //render quiz
         questionIndex++;
+        console.log(timeCounter);
         if (questionIndex < questionPatch.length) {
             renderQuiz(questionPatch[questionIndex]);            
         } else {
+            // stop timer
+            clearInterval(timeInterval);
+            console.log(timeCounter);
             renderSubmitResult();
         };
         
       }    
-})
+});
 
 //click on View Highscores
 
