@@ -168,6 +168,13 @@ startButton.addEventListener("click", function (event) {
 quizBody.addEventListener("click", function (event) {
     var element = event.target;
     if (element.matches("li") === true) {
+        //check answer
+        if (element.textContent === questionPatch[questionIndex].answer) {
+            lastAnswer = "Correct!";
+        } else {
+            lastAnswer = "Wrong!";
+            timeCounter = timeCounter - 10;
+        }
         //render quiz
         questionIndex++;
         if (questionIndex < questionPatch.length) {
