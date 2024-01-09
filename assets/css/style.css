@@ -10,8 +10,13 @@ section {
     align-items: center;
 }
 
+h3 {
+    text-align: left;
+}
+
 li {
     list-style-type:decimal;
+    list-style-position: inside;
 }
 
 #header {
