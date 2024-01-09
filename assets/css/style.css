@@ -10,14 +10,32 @@ section {
     align-items: center;
 }
 
-.header {
+li {
+    list-style-type:decimal;
+}
+
+#header {
     display: flex;
     justify-content: space-between;
     width: 100%;
 }
 
-.view-highscores {
+div#quiz {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.timer {
+p {
+    text-align: center;
+}
+
+div#quiz-body {
+    display: flex;
+    flex-direction: column;
+    align-items: self-start;
+}
+
+a#view-highscores:hover {
+    text-shadow: 3px 3px 5px var(--orange);
 }

@@ -1,1 +1,0 @@
-console.log(questionBank.generateJSQuiz(3));

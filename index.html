@@ -10,21 +10,28 @@
 <body>
     <main>
         <section>
-            <div class="header">
-                <div class="view-highscores" href="#view-highscores">View Highscores</div>
-                <div class="timer">Timer</div>
+            <div id="header">
+                <a id="view-highscores">View Highscores</a>
+                <div id="timer">Time: 0</div>
             </div>
-            <div class="Quiz">
-                <h1>Code Quiz Challenge</h1>
+            <div id="quiz">
+                <div id="quiz-header">
+                    <h1>Code Quiz Challenge</h1>
+                </div>
+                <div id="quiz-body">
+                    <p>Try to answer the following code-related questions within the time limit. Keep in mind that incorrect answers will penalize your scoretime by ten seconds.</p>
+                </div>
+                <div id="quiz-footer">
+                    <button id="start-quiz">Start Quiz</button>
+                </div>
+
             </div>
         </section>
 
 
     </main>
     
-    <!-- JS for questionBank object -->
-    <script src="assets/js/question-bank.js"></script>
     <!-- JS for main program -->
-    <script src="assets/js/script.js"></script>
+    <script src="assets/js/main.js"></script>
 </body>
 </html>
