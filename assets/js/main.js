@@ -95,6 +95,7 @@ var startButton = document.getElementById("start-quiz");
 
 // Global constants and variables
 const numberQuestions = 5;
+const defaultCountdown = 100;
 
 var questionPatch;
 var questionIndex = 0;
@@ -102,16 +103,49 @@ var lastAnswer = "";
 var timeInterval;
 var timeCounter = 100;
 
+//render one child
+function renderOneChild(parentEL, elementType, Text) {
+    parentEL.innerHTML = "";
+    var child = document.createElement(elementType);
+    child.textContent = Text;
+    parentEL.appendChild(child);
+    return child;
+}
+
+// render timer
+function renderTimer(counter) {
+    timeEL.textContent = 'Time: ' + counter;        
+}
+
+// render view-highscores
+function renderViewHighscores() {
+    viewHighscores.textContent = "View Highscores";
+}
+
+// render greeting
+function renderFirstGreeting() {
+    // reset variables
+    questionIndex = 0;
+    lastAnswer = "";
+    timeCounter = 0;
+
+    renderViewHighscores();
+    renderTimer(0);
+
+    //render Quiz greeting
+    renderOneChild(quizHeader, "h1", "Code Quiz Challenge");
+    renderOneChild(quizBody, "p", "Try to answer the following code-related questions within the time limit. Keep in mind that incorrect answers will penalize your scoretime by ten seconds.");
+    renderOneChild(quizFooter, "button", "Start Quiz");  
+};
+
 // render question in quiz.
 function renderQuiz(question) {
     // render question on quiz-header
-    quizHeader.firstElementChild.textContent = question.question;
+    renderOneChild(quizHeader, "h3", question.question);
     
     // render options on quiz-body
-    quizBody.innerHTML = "";
-    var ul = document.createElement("ul");
-    quizBody.appendChild(ul);
-
+    var ul = renderOneChild(quizBody, "ul", "");
+    
     question.options.forEach(element => {
         var li = document.createElement("li");
         li.textContent = element;
@@ -120,11 +154,10 @@ function renderQuiz(question) {
     });
     
     // render last result on quiz-footer
-    quizFooter.innerHTML = "";
-    if (lastAnswer !== "") {   
-        var p = document.createElement("p");
-        p.textContent = lastAnswer;
-        quizFooter.appendChild(p);     
+    if (lastAnswer !== "") {
+        renderOneChild(quizFooter, "p", lastAnswer);
+    } else {
+        quizFooter.innerHTML = "";
     };
 
 }
@@ -132,16 +165,15 @@ function renderQuiz(question) {
 // render submit result
 function renderSubmitResult() {
     // render question on quiz-header
-    quizHeader.firstElementChild.textContent = "All done!";
+    renderOneChild(quizHeader, "h3", "All done!");
+    // quizHeader.firstElementChild.textContent = "All done!";
     
-    // upfate timer
-    timeEL.textContent = 'Time: ' + timeCounter;
+    // update timer
+    renderTimer(timeCounter);
 
     // render final scores on quiz-body
-    quizBody.innerHTML = "";
-    var p = document.createElement("p");
-    p.textContent = "Your final score is " + timeCounter;
-    quizBody.appendChild(p);
+    var text = "Your final score is " + timeCounter;
+    renderOneChild(quizBody, "p", text);
     
     // render Textbox and submit button on quiz-footer
     quizFooter.innerHTML = "";
@@ -149,13 +181,15 @@ function renderSubmitResult() {
 }
 
 // countdown timer
-function startTimer() {
+function startTimer(countdown) {
+    // reset global timeCounter;
+    timeCounter = countdown;
     // Use the `setInterval()` method to call a function to be executed every 1000 milliseconds
     timeInterval = setInterval(function () {
       //
       if (timeCounter > 0) {
         // Show the remaining time.
-        timeEL.textContent = 'Time: ' + timeCounter;
+        renderTimer(timeCounter);
         // Decrement `timeLeft` by 1
         timeCounter--;
       } else {
@@ -166,14 +200,15 @@ function startTimer() {
       }
     }, 1000);
 }
-function init() {    
+function init() {
+    renderFirstGreeting();
 };
 
 // const quiz = questionBank.generateJSQuiz(5);
 // showQuiz(questionBank.generateJSQuiz(5));
 
-//click on Start Quiz button
-startButton.addEventListener("click", function (event) {
+//catch clicking on Start Quiz button
+quizFooter.addEventListener("click", function (event) {
     var element = event.target;
     if (element.matches("button") === true) {
         questionPatch = questionBank.generateJSQuiz(numberQuestions);
@@ -182,12 +217,13 @@ startButton.addEventListener("click", function (event) {
         renderQuiz(questionPatch[questionIndex]);
 
         //start timer
-        startTimer();
+
+        startTimer(defaultCountdown);
 
       }    
 });
 
-//click on option in quiz-body to make choice
+//catch clicking on options in quiz-body to make choice
 quizBody.addEventListener("click", function (event) {
     var element = event.target;
     if (element.matches("li") === true) {
@@ -200,13 +236,11 @@ quizBody.addEventListener("click", function (event) {
         }
         //render quiz
         questionIndex++;
-        console.log(timeCounter);
         if (questionIndex < questionPatch.length) {
             renderQuiz(questionPatch[questionIndex]);            
         } else {
-            // stop timer
+            // stop timer and show result
             clearInterval(timeInterval);
-            console.log(timeCounter);
             renderSubmitResult();
         };
         
