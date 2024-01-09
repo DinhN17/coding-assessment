@@ -86,6 +86,7 @@ const questionBank = {
 
 // HTML elements
 var viewHighscores = document.getElementById("view-highscores");
+var header = document.getElementById("header");
 var timeEL = document.getElementById("timer");
 var quizEL = document.getElementById("quiz");
 var quizHeader = document.getElementById("quiz-header");
@@ -135,7 +136,10 @@ function renderFirstGreeting() {
     //render Quiz greeting
     renderOneChild(quizHeader, "h1", "Code Quiz Challenge");
     renderOneChild(quizBody, "p", "Try to answer the following code-related questions within the time limit. Keep in mind that incorrect answers will penalize your scoretime by ten seconds.");
-    renderOneChild(quizFooter, "button", "Start Quiz");  
+    renderOneChild(quizFooter, "button", "Start Quiz");
+
+    // set styles
+    header.setAttribute("style", "display: flex; justify-content: space-between; width: 100%;");
 };
 
 // render question in quiz.
