@@ -54,9 +54,10 @@ const questionBank = {
         return this.jsQuestions[index];
     },
     
-    // _getRandomPatch return an array which elements are randomly pick from source array.
+    // _getRandomPatch return an array which elements are randomly picked from source array.
     _getRandomPatch: function(srcArray, patchLength) {
         var retArray = [];
+        // deep copy array to make sure the operations don't affect the srcArray.
         var tempArray = JSON.parse(JSON.stringify(srcArray));
         if (patchLength > tempArray.length) {
             patchLength = tempArray.length;            
@@ -85,8 +86,10 @@ const questionBank = {
 }
 
 var scoreTable = {
+    // scores is used to keep list of historic user and their score.
     scores : [],
-    // get score and save scores to localstorage
+
+    // saveScore gets score and save scores to scoreTable in localStorage after transform to string.
     saveScore : function(initial, time) {
         var userScore = {
             user: initial,
@@ -97,13 +100,16 @@ var scoreTable = {
         localStorage.setItem('scoreTable', JSON.stringify(this.scores));
     },
     
+    // loadScore returns array of objects from scoreTable in localStorage.
     loadScore : function() {
         if (localStorage.getItem("scoreTable") != null) {
+            //  get string from scoreTable in localStorage and transform back to array of objects.
             this.scores = JSON.parse(localStorage.getItem("scoreTable"));           
         };
         return this.scores;
     },
-
+    
+    // clearAll clears the array scores and scoreTable in localStorage
     clearAll : function() {
         if (this.scores.length != 0) {
             this.scores.length = 0;
@@ -121,20 +127,25 @@ var cardHeader = document.getElementById("card-header");
 var cardBody = document.getElementById("card-body");
 var cardFooter = document.getElementById("card-footer");
 var startButton = document.getElementById("start-quiz");
-var submitButton;
+
+// global inputInitials element to get initials at the result page, 
+// will be created as child of cardFooter.
 var inputInitials;
 
 // Global constants and variables
+//default amount of questions of quiz.
 const numberQuestions = 5;
+//default total score of quiz.
 const defaultCountdown = 100;
 
-var questionPatch;
+var questionPatch = [];
 var questionIndex = 0;
+
 var lastAnswer = "";
-var timeInterval;
+var timeInterval = 0;
 var timeCounter = 100;
 
-//render one child
+// renderOneChild: create an element, add text and append it to given element.
 function renderOneChild(parentEL, elementType, Text) {
     parentEL.innerHTML = "";
     var child = document.createElement(elementType);
@@ -151,10 +162,9 @@ function renderTimer(counter) {
 // render view-highscores
 function renderViewHighscores() {
     viewHighscores.textContent = "View Highscores";
-
 }
 
-// render greeting
+// render greeting page
 function renderFirstGreeting() {
     // reset variables
     questionIndex = 0;
@@ -169,7 +179,7 @@ function renderFirstGreeting() {
     renderOneChild(cardBody, "p", "Try to answer the following code-related questions within the time limit. Keep in mind that incorrect answers will penalize your scoretime by ten seconds.");
     renderOneChild(cardFooter, "button", "Start Quiz");
 
-    // set styles
+    // set styles and remove styles from last run.
     cardEl.classList.remove('highscores-card');
     cardEl.classList.remove('quiz-card');
     cardEl.classList.add('greeting-card');
@@ -180,7 +190,7 @@ function renderQuiz(question) {
     // render question on card-header
     renderOneChild(cardHeader, "h3", question.question);
     
-    // render options on card-body
+    // render options to choose on card-body
     var ul = renderOneChild(cardBody, "ul", "");
     
     question.options.forEach(element => {
@@ -190,9 +200,20 @@ function renderQuiz(question) {
         ul.appendChild(li);                
     });
     
-    // render last result on card-footer
+    // render last result on card-footer and will be disapeared after 1s.
     if (lastAnswer !== "") {
-        renderOneChild(cardFooter, "p", lastAnswer);
+        var resultBox = document.createElement("p");
+        resultBox.textContent = lastAnswer;
+        resultBox.style.alignSelf = "flex-start";
+        resultBox.classList.add('card');
+        cardEl.style.borderBottomStyle = "solid";
+        cardEl.parentElement.append(resultBox);
+        // set timeout to disappear the last result
+        setTimeout(() => {
+            resultBox.remove();
+            cardEl.style.borderBottomStyle = "none";
+        }, 1000);
+        
     } else {
         cardFooter.innerHTML = "";
     };
@@ -203,14 +224,13 @@ function renderQuiz(question) {
 
 // render submit result
 function renderSubmitResult() {
-    // render question on card-header
+    // render All done greeting on cardHeader.
     renderOneChild(cardHeader, "h3", "All done!");
-    // cardHeader.firstElementChild.textContent = "All done!";
     
     // update timer
     renderTimer(timeCounter);
 
-    // render final scores on card-body
+    // render final score on card-body
     var text = "Your final score is " + timeCounter;
     renderOneChild(cardBody, "p", text);
     
@@ -218,10 +238,10 @@ function renderSubmitResult() {
     renderOneChild(cardFooter, "label", "Enter initials: ");
     inputInitials = document.createElement("input");
     cardFooter.appendChild(inputInitials); 
-    submitButton = document.createElement("button");
+    
+    var submitButton = document.createElement("button");
     submitButton.textContent = "Submit";
     cardFooter.appendChild(submitButton);
-
 }
 
 // render Highscores List
@@ -234,13 +254,14 @@ function renderHighscores() {
     // render player list on card-body
     var ul = renderOneChild(cardBody, "ul", "");
     
+    // render all of historic scores from localstorage
     scoreTable.loadScore().forEach(element => {
         var li = document.createElement("li");
         li.textContent = element.user + " - " + element.score;
         ul.appendChild(li);                
     });
 
-    // render Go Back and Clear Highscores button on card-footer
+    // render Go Back and Clear Highscores buttons on card-footer.
     renderOneChild(cardFooter, "button", "Go Back");
     clearHighscoresButton = document.createElement("button");
     clearHighscoresButton.textContent = "Clear Highscores";
@@ -252,13 +273,12 @@ function renderHighscores() {
 
 // countdown timer
 function startTimer(countdown) {
-    // reset global timeCounter;
+    // set global timeCounter by parameter countdown of function.
     timeCounter = countdown;
     // Use the `setInterval()` method to call a function to be executed every 1000 milliseconds
     timeInterval = setInterval(function () {
-      //
       if (timeCounter > 0) {
-        // Show the remaining time.
+        // show the remaining time.
         renderTimer(timeCounter);
         // Decrement `timeLeft` by 1
         timeCounter--;
@@ -269,7 +289,8 @@ function startTimer(countdown) {
         renderSubmitResult();
       }
     }, 1000);
-}
+};
+
 function init() {
     renderFirstGreeting();
 };
@@ -280,25 +301,29 @@ cardFooter.addEventListener("click", function (event) {
     if (element.matches("button") === true) {
         switch (element.textContent) {
             case "Start Quiz":
+                // get a patch of random questions from questionBank
                 questionPatch = questionBank.generateJSQuiz(numberQuestions);
-                //render quiz
+                // render the first question of the quiz
                 questionIndex = 0;
                 renderQuiz(questionPatch[questionIndex]);
 
-                //start timer
+                // start timer
                 startTimer(defaultCountdown);   
                 break;
 
             case "Submit":
-                scoreTable.saveScore(cardFooter.children[1].value,timeCounter);
+                // catch submit button to save result to localstorage.
+                scoreTable.saveScore(inputInitials.value,timeCounter);
                 renderHighscores();    
                 break;
 
             case "Go Back":
+                // catch Go Back button to go to the first page.
                 renderFirstGreeting();
                 break;
 
             case "Clear Highscores":
+                // catch Clear Highscores button to clear all of result in local storage.
                 scoreTable.clearAll();
                 renderHighscores();
                 break;
@@ -309,18 +334,21 @@ cardFooter.addEventListener("click", function (event) {
     };
 });
 
-//catch clicking on options in card-body to make choice
+// catch click on options in card-body to make choice
 cardBody.addEventListener("click", function (event) {
     var element = event.target;
-    if ((element.matches("li") === true) && (cardHeader.textContent != "Highscores")) {
-        //check answer
+    if ((element.matches("li") === true) &&
+            cardHeader.textContent != "Highscores") {
+        // check answer
         if (element.textContent === questionPatch[questionIndex].answer) {
             lastAnswer = "Correct!";
         } else {
             lastAnswer = "Wrong!";
+            // when answer is wrong, minus time by 10
             timeCounter = timeCounter - 10;
         }
-        //render quiz
+
+        // check if there is next question, render it, if not, render result.
         questionIndex++;
         if (questionIndex < questionPatch.length) {
             renderQuiz(questionPatch[questionIndex]);            
@@ -333,7 +361,7 @@ cardBody.addEventListener("click", function (event) {
     };    
 });
 
-//click on View Highscores
+// catch click on View Highscores
 viewHighscores.addEventListener("click", function (event) {
     var element = event.target;
     if (element.matches("a") === true) {
