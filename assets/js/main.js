@@ -84,15 +84,45 @@ const questionBank = {
     },
 }
 
+var scoreTable = {
+    scores : [],
+    // get score and save scores to localstorage
+    saveScore : function(initial, time) {
+        var userScore = {
+            user: initial,
+            score: time,
+        };
+        // console.log(userScore);
+        this.scores.push(userScore);
+        // console.log(this.scores);
+        localStorage.setItem('scoreTable', JSON.stringify(this.scores));
+    },
+    
+    loadScore : function() {
+        if (localStorage.getItem("scoreTable") != null) {
+            this.scores = JSON.parse(localStorage.getItem("scoreTable"));           
+        };        
+    },
+
+    clearAll : function() {
+        if (this.scores.length != 0) {
+            this.scores.length = 0;
+        };
+        localStorage.removeItem("scoreTable");
+    }
+};
+
 // HTML elements
 var viewHighscores = document.getElementById("view-highscores");
 var header = document.getElementById("header");
 var timeEL = document.getElementById("timer");
-var quizEL = document.getElementById("quiz");
-var quizHeader = document.getElementById("quiz-header");
-var quizBody = document.getElementById("quiz-body");
-var quizFooter = document.getElementById("quiz-footer");
+var cardEl = document.getElementById("card");
+var cardHeader = document.getElementById("card-header");
+var cardBody = document.getElementById("card-body");
+var cardFooter = document.getElementById("card-footer");
 var startButton = document.getElementById("start-quiz");
+var submitButton;
+var inputInitials;
 
 // Global constants and variables
 const numberQuestions = 5;
@@ -121,6 +151,7 @@ function renderTimer(counter) {
 // render view-highscores
 function renderViewHighscores() {
     viewHighscores.textContent = "View Highscores";
+
 }
 
 // render greeting
@@ -134,55 +165,94 @@ function renderFirstGreeting() {
     renderTimer(0);
 
     //render Quiz greeting
-    renderOneChild(quizHeader, "h1", "Code Quiz Challenge");
-    renderOneChild(quizBody, "p", "Try to answer the following code-related questions within the time limit. Keep in mind that incorrect answers will penalize your scoretime by ten seconds.");
-    renderOneChild(quizFooter, "button", "Start Quiz");
+    renderOneChild(cardHeader, "h1", "Code Quiz Challenge");
+    renderOneChild(cardBody, "p", "Try to answer the following code-related questions within the time limit. Keep in mind that incorrect answers will penalize your scoretime by ten seconds.");
+    renderOneChild(cardFooter, "button", "Start Quiz");
 
     // set styles
-    header.setAttribute("style", "display: flex; justify-content: space-between; width: 100%;");
+    // header.setAttribute("style", "display: flex; justify-content: space-between; width: 100%;");
+    cardEl.classList.remove('highscores-card');
+    cardEl.classList.add('greeting-card');
 };
 
 // render question in quiz.
 function renderQuiz(question) {
-    // render question on quiz-header
-    renderOneChild(quizHeader, "h3", question.question);
+    // render question on card-header
+    renderOneChild(cardHeader, "h3", question.question);
     
-    // render options on quiz-body
-    var ul = renderOneChild(quizBody, "ul", "");
+    // render options on card-body
+    var ul = renderOneChild(cardBody, "ul", "");
     
     question.options.forEach(element => {
         var li = document.createElement("li");
         li.textContent = element;
-        
+        li.classList.add('option-list');
         ul.appendChild(li);                
     });
     
-    // render last result on quiz-footer
+    // render last result on card-footer
     if (lastAnswer !== "") {
-        renderOneChild(quizFooter, "p", lastAnswer);
+        renderOneChild(cardFooter, "p", lastAnswer);
     } else {
-        quizFooter.innerHTML = "";
+        cardFooter.innerHTML = "";
     };
 
+    // set styles
+    cardEl.classList.add('quiz-card');
 }
 
 // render submit result
 function renderSubmitResult() {
-    // render question on quiz-header
-    renderOneChild(quizHeader, "h3", "All done!");
-    // quizHeader.firstElementChild.textContent = "All done!";
+    // render question on card-header
+    renderOneChild(cardHeader, "h3", "All done!");
+    // cardHeader.firstElementChild.textContent = "All done!";
     
     // update timer
     renderTimer(timeCounter);
 
-    // render final scores on quiz-body
+    // render final scores on card-body
     var text = "Your final score is " + timeCounter;
-    renderOneChild(quizBody, "p", text);
+    renderOneChild(cardBody, "p", text);
     
-    // render Textbox and submit button on quiz-footer
-    quizFooter.innerHTML = "";
-    
+    // render Textbox and submit button on card-footer
+    //cardFooter.innerHTML = "";
+    renderOneChild(cardFooter, "label", "Enter initials: ");
+    inputInitials = document.createElement("input");
+    cardFooter.appendChild(inputInitials); 
+    submitButton = document.createElement("button");
+    submitButton.textContent = "Submit";
+    cardFooter.appendChild(submitButton);
+
+    // set styles
+    //cardFooter.setAttribute("styles", "display: inline-flex;");
 }
+
+// render Highscores List
+function renderHighscores() {
+    viewHighscores.textContent = "";
+    clearInterval(timeInterval);
+    timeEL.textContent = "";
+    renderOneChild(cardHeader, "h3", "Highscores");
+
+    // render player list on card-body
+    var ul = renderOneChild(cardBody, "ul", "");
+    
+    scoreTable.loadScore();
+    scoreTable.scores.forEach(element => {
+        var li = document.createElement("li");
+        li.textContent = element.user + " - " + element.score;
+        ul.appendChild(li);                
+    });
+
+    // render Go Back and Clear Highscores button on card-footer
+    renderOneChild(cardFooter, "button", "Go Back");
+    clearHighscoresButton = document.createElement("button");
+    clearHighscoresButton.textContent = "Clear Highscores";
+    cardFooter.appendChild(clearHighscoresButton);
+    
+    // set styles
+    cardEl.classList.add('highscores-card');
+};
 
 // countdown timer
 function startTimer(countdown) {
@@ -208,29 +278,45 @@ function init() {
     renderFirstGreeting();
 };
 
-// const quiz = questionBank.generateJSQuiz(5);
-// showQuiz(questionBank.generateJSQuiz(5));
-
-//catch clicking on Start Quiz button
-quizFooter.addEventListener("click", function (event) {
+//catch clicking on button at card footer
+cardFooter.addEventListener("click", function (event) {
     var element = event.target;
     if (element.matches("button") === true) {
-        questionPatch = questionBank.generateJSQuiz(numberQuestions);
-        //render quiz
-        questionIndex = 0;
-        renderQuiz(questionPatch[questionIndex]);
+        switch (element.textContent) {
+            case "Start Quiz":
+                questionPatch = questionBank.generateJSQuiz(numberQuestions);
+                //render quiz
+                questionIndex = 0;
+                renderQuiz(questionPatch[questionIndex]);
 
-        //start timer
+                //start timer
+                startTimer(defaultCountdown);   
+                break;
 
-        startTimer(defaultCountdown);
+            case "Submit":
+                scoreTable.saveScore(cardFooter.children[1].value,timeCounter);
+                renderHighscores();    
+                break;
 
-      }    
+            case "Go Back":
+                renderFirstGreeting();
+                break;
+
+            case "Clear Highscores":
+                scoreTable.clearAll();
+                renderHighscores();
+                break;
+        
+            default:
+                break;
+        };   
+    };
 });
 
-//catch clicking on options in quiz-body to make choice
-quizBody.addEventListener("click", function (event) {
+//catch clicking on options in card-body to make choice
+cardBody.addEventListener("click", function (event) {
     var element = event.target;
-    if (element.matches("li") === true) {
+    if ((element.matches("li") === true) && (cardHeader.textContent != "Highscores")) {
         //check answer
         if (element.textContent === questionPatch[questionIndex].answer) {
             lastAnswer = "Correct!";
@@ -248,9 +334,15 @@ quizBody.addEventListener("click", function (event) {
             renderSubmitResult();
         };
         
-      }    
+    };    
 });
 
 //click on View Highscores
+viewHighscores.addEventListener("click", function (event) {
+    var element = event.target;
+    if (element.matches("a") === true) {
+        renderHighscores();
+    }
+})
 
 init();
