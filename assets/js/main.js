@@ -116,10 +116,10 @@ var scoreTable = {
 var viewHighscores = document.getElementById("view-highscores");
 var header = document.getElementById("header");
 var timeEL = document.getElementById("timer");
-var cardEl = document.getElementById("quiz");
-var cardHeader = document.getElementById("quiz-header");
-var cardBody = document.getElementById("quiz-body");
-var cardFooter = document.getElementById("quiz-footer");
+var cardEl = document.getElementById("card");
+var cardHeader = document.getElementById("card-header");
+var cardBody = document.getElementById("card-body");
+var cardFooter = document.getElementById("card-footer");
 var startButton = document.getElementById("start-quiz");
 var submitButton;
 var inputInitials;
@@ -170,25 +170,27 @@ function renderFirstGreeting() {
     renderOneChild(cardFooter, "button", "Start Quiz");
 
     // set styles
-    header.setAttribute("style", "display: flex; justify-content: space-between; width: 100%;");
+    // header.setAttribute("style", "display: flex; justify-content: space-between; width: 100%;");
+    cardEl.classList.remove('highscores-card');
+    cardEl.classList.add('greeting-card');
 };
 
 // render question in quiz.
 function renderQuiz(question) {
-    // render question on quiz-header
+    // render question on card-header
     renderOneChild(cardHeader, "h3", question.question);
     
-    // render options on quiz-body
+    // render options on card-body
     var ul = renderOneChild(cardBody, "ul", "");
     
     question.options.forEach(element => {
         var li = document.createElement("li");
         li.textContent = element;
-        
+        li.classList.add('option-list');
         ul.appendChild(li);                
     });
     
-    // render last result on quiz-footer
+    // render last result on card-footer
     if (lastAnswer !== "") {
         renderOneChild(cardFooter, "p", lastAnswer);
     } else {
@@ -196,23 +198,23 @@ function renderQuiz(question) {
     };
 
     // set styles
-    cardEl.setAttribute("style", "display: flex; flex-direction: column; align-items: start; align-self: flex-start; margin-left: 21%; width: 100%");
+    cardEl.classList.add('quiz-card');
 }
 
 // render submit result
 function renderSubmitResult() {
-    // render question on quiz-header
+    // render question on card-header
     renderOneChild(cardHeader, "h3", "All done!");
     // cardHeader.firstElementChild.textContent = "All done!";
     
     // update timer
     renderTimer(timeCounter);
 
-    // render final scores on quiz-body
+    // render final scores on card-body
     var text = "Your final score is " + timeCounter;
     renderOneChild(cardBody, "p", text);
     
-    // render Textbox and submit button on quiz-footer
+    // render Textbox and submit button on card-footer
     //cardFooter.innerHTML = "";
     renderOneChild(cardFooter, "label", "Enter initials: ");
     inputInitials = document.createElement("input");
@@ -228,6 +230,7 @@ function renderSubmitResult() {
 // render Highscores List
 function renderHighscores() {
     viewHighscores.textContent = "";
+    clearInterval(timeInterval);
     timeEL.textContent = "";
     renderOneChild(cardHeader, "h3", "Highscores");
 
@@ -247,6 +250,8 @@ function renderHighscores() {
     clearHighscoresButton.textContent = "Clear Highscores";
     cardFooter.appendChild(clearHighscoresButton);
     
+    // set styles
+    cardEl.classList.add('highscores-card');
 };
 
 // countdown timer
@@ -308,10 +313,10 @@ cardFooter.addEventListener("click", function (event) {
     };
 });
 
-//catch clicking on options in quiz-body to make choice
+//catch clicking on options in card-body to make choice
 cardBody.addEventListener("click", function (event) {
     var element = event.target;
-    if (element.matches("li") === true) {
+    if ((element.matches("li") === true) && (cardHeader.textContent != "Highscores")) {
         //check answer
         if (element.textContent === questionPatch[questionIndex].answer) {
             lastAnswer = "Correct!";
@@ -329,7 +334,7 @@ cardBody.addEventListener("click", function (event) {
             renderSubmitResult();
         };
         
-      }    
+    };    
 });
 
 //click on View Highscores
