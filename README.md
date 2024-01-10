@@ -6,7 +6,7 @@ This coding asssessment page was created as a timed Javascript quiz with multipl
 
 ## Screenshot
 
-![Screenshot](./assets/images/Screenshot.PNG)
+![Screenshot](./assets/images/ScreenShot.PNG)
 
 ## Usage
 
