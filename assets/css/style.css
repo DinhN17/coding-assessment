@@ -23,11 +23,6 @@ a:hover {
     text-shadow: 3px 3px 5px var(--orange);
 }
 
-/* button:hover {
-    text-shadow: 3px 3px 5px var(--orange);
-    
-} */
-
 /* button effect source from https://www.sliderrevolution.com/resources/css-button-hover-effects/ */
 button {
     color: var(--akaroa);
@@ -53,15 +48,6 @@ button {
     text-shadow: 3px 3px 5px var(--orange);
     transition: all 250ms linear;
   }
-
-
-
-/* button {
-    color: var(--akaroa);
-    background-color: var(--cloud-burst);
-    border-radius: var(--borderRadius);
-    margin-left: 3px;
-} */
 
 section {
     display: flex;
@@ -118,22 +104,14 @@ li {
     width: 100%;
 }
 
-/* div#quiz {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-} */
-
 p {
     text-align: center;
 }
 
-/* div#quiz-body {
-    display: flex;
-    flex-direction: column;
-    align-items: self-start;
-} */
-
-a#view-highscores:hover {
-    text-shadow: 3px 3px 5px var(--orange);
+@media all and (min-width: 360px) {
+    .card {padding: 0;}
+}
+  
+@media all and (min-width: 768px) {
+    .card {padding: 0 21%;}
 }

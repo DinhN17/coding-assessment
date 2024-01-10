@@ -92,16 +92,16 @@ var scoreTable = {
             user: initial,
             score: time,
         };
-        // console.log(userScore);
+        
         this.scores.push(userScore);
-        // console.log(this.scores);
         localStorage.setItem('scoreTable', JSON.stringify(this.scores));
     },
     
     loadScore : function() {
         if (localStorage.getItem("scoreTable") != null) {
             this.scores = JSON.parse(localStorage.getItem("scoreTable"));           
-        };        
+        };
+        return this.scores;
     },
 
     clearAll : function() {
@@ -170,8 +170,8 @@ function renderFirstGreeting() {
     renderOneChild(cardFooter, "button", "Start Quiz");
 
     // set styles
-    // header.setAttribute("style", "display: flex; justify-content: space-between; width: 100%;");
     cardEl.classList.remove('highscores-card');
+    cardEl.classList.remove('quiz-card');
     cardEl.classList.add('greeting-card');
 };
 
@@ -215,7 +215,6 @@ function renderSubmitResult() {
     renderOneChild(cardBody, "p", text);
     
     // render Textbox and submit button on card-footer
-    //cardFooter.innerHTML = "";
     renderOneChild(cardFooter, "label", "Enter initials: ");
     inputInitials = document.createElement("input");
     cardFooter.appendChild(inputInitials); 
@@ -223,8 +222,6 @@ function renderSubmitResult() {
     submitButton.textContent = "Submit";
     cardFooter.appendChild(submitButton);
 
-    // set styles
-    //cardFooter.setAttribute("styles", "display: inline-flex;");
 }
 
 // render Highscores List
@@ -237,8 +234,7 @@ function renderHighscores() {
     // render player list on card-body
     var ul = renderOneChild(cardBody, "ul", "");
     
-    scoreTable.loadScore();
-    scoreTable.scores.forEach(element => {
+    scoreTable.loadScore().forEach(element => {
         var li = document.createElement("li");
         li.textContent = element.user + " - " + element.score;
         ul.appendChild(li);                
