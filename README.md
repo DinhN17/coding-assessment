@@ -20,7 +20,7 @@ Right or wrong will be showed at the bottom of quiz in 1 second.
 
 If the answer is wrong, the time will be subtracted by 10 seconds.
 
-The quiz is over when the timer reaches 0 or all questions are answered.
+The quiz is over when the timer reaches 0 or all questions are answered. The score is the time left when the quiz is over.
 
 The user can save their initials and score and also see the historic scores by clicking on View Highscores on the top left of screen.
 
